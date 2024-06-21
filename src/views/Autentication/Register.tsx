@@ -1,40 +1,66 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Card, CardBody, Input, Button, Link } from "@nextui-org/react";
+import { Card, CardBody, Input, Button } from "@nextui-org/react";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Inputs = {
   login: string;
   password: string;
 };
 function Register() {
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  const User = z.object({
+    login: z.string().email("Email invalido"),
+    password: z
+      .string()
+      .min(8, " A senha deve ter ao menos 8 caracteres")
+      .regex(
+        passwordRegex,
+        "A senha deve ter pelo menos um número, uma letra maiúscula, uma letra minúscula e um caractere especial."
+      ),
+  });
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log("data: ", data);
+  } = useForm<Inputs>({
+    resolver: zodResolver(User),
+  });
 
-  const [isVisible, setIsVisible] = useState(false);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log("data: ", data);
+    const validation = User.safeParse(data);
+    console.log("validation: ", validation);
+  };
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
   return (
     <div
       className="flex items-center justify-center min-h-screen"
       style={{ backgroundColor: "#d1e8f0" }}
     >
-      <h1>
-        <strong>REGISTRO</strong>
-      </h1>
       <Card
-        className="border-none  dark:bg-default-100/50 w-[400px] max-w-[610px] h-[400px] max-w-[500px]  "
+        className="border-none dark:bg-default-100/50 w-[400px]  h-[500px]  "
         shadow="sm"
       >
         <CardBody>
-          <div className="items-center justify-center  max-w-[610px]">
+          <div className="items-center justify-center ">
             <div>
+              <div className="text-gray-500">
+                <p className="text-3xl ">
+                  {" "}
+                  <strong>Cadastre-se</strong>
+                </p>
+                <h5>É rapido e facil</h5>
+              </div>
               <h1 className="flex items-center justify-center h-full my-5">
                 LOGO
               </h1>
@@ -43,8 +69,13 @@ function Register() {
                   type="email"
                   label="Email"
                   {...register("login", { required: true })}
+                  arial-invalid={errors.login ? "true" : "false"}
                 />
-
+                {errors.login && (
+                  <p role="alert" className="text-red-500 text-sm">
+                    {errors.login.message}
+                  </p>
+                )}
                 <Input
                   {...register("password", { required: true })}
                   label="Password"
@@ -64,20 +95,24 @@ function Register() {
                     </button>
                   }
                   type={isVisible ? "text" : "password"}
-                  className=" my-5"
+                  className=" mt-5"
+                  arial-invalid={errors.login ? "true" : "false"}
                 />
+                {errors.password && (
+                  <p role="alert" className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
                 <div className="flex items-center justify-center h-full mt-10 ">
                   <Button color="primary" type="submit">
-                    Login
+                    Cadastra-se
                   </Button>
                 </div>
               </form>
               <div className="flex flex-col items-center justify-center h-full mt-5">
-                <div className="flex flex-row">
-                  <h2>Não tem uma conta?</h2>
-                  <Link href="#">Cadastre-se</Link>
-                </div>
-                <Link href="#">Esqueci a minha senha</Link>
+                <Link to={"/"} className="text-blue-600">
+                  Login
+                </Link>
               </div>
             </div>
           </div>

@@ -4,20 +4,33 @@ import { Card, CardBody, Input, Button } from "@nextui-org/react";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Inputs = {
   login: string;
   password: string;
 };
+
 function Login() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const User = z.object({
+    login: z.string().email("Email inválido"),
+    password: z.string().min(8, "Digite a senha"),
+  });
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log("data: ", data);
-
-  const [isVisible, setIsVisible] = useState(false);
+  } = useForm<Inputs>({
+    resolver: zodResolver(User),
+  });
+  console.log("errors: ", errors);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const validation = User.safeParse(data);
+    console.log("validation", validation);
+  };
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   return (
@@ -26,7 +39,7 @@ function Login() {
       style={{ backgroundColor: "#d1e8f0" }}
     >
       <Card
-        className="border-none  dark:bg-default-100/50 w-[400px] max-w-[610px] h-[400px] max-w-[500px]  "
+        className="border-none  dark:bg-default-100/50 w-[400px] max-w-[610px] h-[450px]   "
         shadow="sm"
       >
         <CardBody>
@@ -40,7 +53,13 @@ function Login() {
                   type="email"
                   label="Email"
                   {...register("login", { required: true })}
+                  arial-invalid={errors.login ? "true" : "false"}
                 />
+                {errors.login && (
+                  <p role="alert" className="text-red-500 text-sm">
+                    {errors.login.message}
+                  </p>
+                )}
 
                 <Input
                   {...register("password", { required: true })}
@@ -60,9 +79,15 @@ function Login() {
                       )}
                     </button>
                   }
+                  className="mt-5"
                   type={isVisible ? "text" : "password"}
-                  className=" my-5"
+                  arial-invalid={errors.login ? "true" : "false"}
                 />
+                {errors.password && (
+                  <p role="alert" className="text-red-500 text-sm mb-5">
+                    {errors.password.message}
+                  </p>
+                )}
                 <div className="flex items-center justify-center h-full mt-10 ">
                   <Button color="primary" type="submit">
                     Login
@@ -79,7 +104,6 @@ function Login() {
                 <Link to={"register"} className="text-blue-600">
                   Esqueci a minha senha
                 </Link>
-                {/* <Link href="register">Esqueci a minha senha</Link> */}
               </div>
             </div>
           </div>
