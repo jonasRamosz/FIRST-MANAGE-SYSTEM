@@ -6,6 +6,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 
 type Inputs = {
   login: string;
@@ -29,6 +30,16 @@ function Login() {
   console.log("errors: ", errors);
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const validation = User.safeParse(data);
+    if (validation.success === true) {
+      const login = "login@login.com";
+      const password = "Senha@123";
+      if (
+        validation.data.login !== login ||
+        validation.data.password !== password
+      ) {
+        toast.error("Login ou senha invalidos !");
+      }
+    }
     console.log("validation", validation);
   };
 
