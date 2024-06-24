@@ -3,9 +3,10 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Card, CardBody, Input, Button } from "@nextui-org/react";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 
 type Inputs = {
   login: string;
@@ -14,7 +15,7 @@ type Inputs = {
 function Register() {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
-
+  const navigate = useNavigate();
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -40,6 +41,10 @@ function Register() {
     console.log("data: ", data);
     const validation = User.safeParse(data);
     console.log("validation: ", validation);
+    if (validation.success === true) {
+      toast.success("Registrado com sucesso !");
+      navigate("/");
+    }
   };
 
   return (
@@ -48,7 +53,7 @@ function Register() {
       style={{ backgroundColor: "#d1e8f0" }}
     >
       <Card
-        className="border-none dark:bg-default-100/50 w-[400px]  h-[500px]  "
+        className="border-none dark:bg-default-100/50 w-[400px]  h-[480px]  "
         shadow="sm"
       >
         <CardBody>
